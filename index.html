@@ -1,26 +1,37 @@
-<button onclick="payNow()">Pay Now</button>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RedTrex Pay</title>
+</head>
+<body>
+
+<h2>Pay Now</h2>
+
+<button id="payBtn">Pay 100 LKR</button>
 
 <script>
-function payNow() {
-    fetch("https://webxpayipg.onrender.com/create-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            order_id: "ORDER123",
-            amount: "100.00",
-            currency: "LKR",
-            customer_name: "Dilanka",
-            customer_email: "d@example.com",
-            customer_phone: "0712345678",
-            return_url: "https://redtrex.store/success",
-            cancel_url: "https://redtrex.store/cancel"
-        })
-    })
-    .then(res => res.text())
-    .then(html => {
-        document.write(html);
-        document.close();
-    })
-    .catch(err => console.error(err));
-}
+document.getElementById("payBtn").onclick = async () => {
+  const payload = {
+    order_id: "ORDER123",
+    amount: "100",
+    currency: "LKR",
+    first_name: "Dilanka",
+    last_name: "Fernando",
+    email: "test@example.com",
+    contact_number: "0771234567",
+    address_line_one: "Colombo"
+  };
+
+  const response = await fetch("https://webxpayipg.onrender.com/create-payment", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)
+  });
+
+  const html = await response.text();
+  document.write(html);
+};
 </script>
+
+</body>
+</html>
