@@ -1,21 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>RedTrex Pay</title>
-</head>
-<body>
-  <h2>Checkout</h2>
-  <form action="https://webxpayipg.onrender.com/create-payment" method="POST">
-    <input type="hidden" name="order_id" value="525">
-    <input type="hidden" name="amount" value="1000">
-    <input type="hidden" name="currency" value="LKR">
-    <input type="hidden" name="first_name" value="John">
-    <input type="hidden" name="last_name" value="Doe">
-    <input type="hidden" name="email" value="customer@email.com">
-    <input type="hidden" name="contact_number" value="0777888999">
-    <input type="hidden" name="address_line_one" value="46/46, Green Lanka Building">
-    <button type="submit">Pay Now</button>
-  </form>
-</body>
-</html>
+<button onclick="payNow()">Pay Now</button>
+
+<script>
+function payNow() {
+    fetch("https://your-backend-url/create-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            order_id: "ORDER123",
+            amount: "100.00",
+            currency: "LKR",
+            customer_name: "Dilanka",
+            customer_email: "d@example.com",
+            customer_phone: "0712345678",
+            return_url: "https://redtrex.store/success",
+            cancel_url: "https://redtrex.store/cancel"
+        })
+    })
+    .then(res => res.text())
+    .then(html => {
+        document.write(html);
+        document.close();
+    })
+    .catch(err => console.error(err));
+}
+</script>
