@@ -1,84 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Webxpay Payment Test</title>
-<style>
-body { font-family: sans-serif; padding: 20px; }
-input { padding: 8px; margin-bottom: 10px; width: 250px; display: block; }
-button { padding: 10px 20px; cursor: pointer; background-color: #4CAF50; color: white; border: none; }
-#debugOutput { margin-top: 20px; border: 1px solid #ccc; padding: 10px; display: none; }
-</style>
+  <meta charset="UTF-8">
+  <title>Webxpay Payment Test</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, button { padding: 10px; margin: 5px 0; }
+    button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+  </style>
 </head>
 <body>
-<h2>Webxpay Payment Test</h2>
+  <h2>Webxpay Payment Test (Redirect Flow)</h2>
 
-<input type="text" id="amount" value="100.00" placeholder="Amount">
-<input type="text" id="email" value="test.user@example.com" placeholder="Email">
-<input type="text" id="first_name" value="Test" placeholder="First Name">
-<input type="text" id="last_name" value="User" placeholder="Last Name">
-<input type="text" id="contact_number" value="+94712622012" placeholder="Contact Number">
-<input type="text" id="address_line_one" value="123 Colombo Road" placeholder="Address">
+  <input type="text" id="amount" value="100.00" placeholder="Amount (e.g., 100.00)">
+  <button id="payButton">Pay Now (LKR)</button>
 
-<button id="payButton">Pay Now</button>
-<div id="debugOutput"></div>
+  <script>
+    document.getElementById("payButton").addEventListener("click", async () => {
+      const orderId = "TEST-" + Date.now();
+      const amount = parseFloat(document.getElementById("amount").value).toFixed(2);
 
-<script>
-const payButton = document.getElementById("payButton");
-const debugOutput = document.getElementById("debugOutput");
-const backendUrl = "https://webxpayipg.onrender.com/create-payment";
+      try {
+        const res = await fetch("https://webxpayipg.onrender.com/create-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ order_id: orderId, amount: amount })
+        });
 
-payButton.addEventListener("click", async () => {
-  try {
-    const orderId = "TEST-" + Math.floor(Date.now() / 1000);
-    const formattedAmount = parseFloat(document.getElementById("amount").value).toFixed(2);
+        const html = await res.text();
+        if (!res.ok) throw new Error(html);
 
-    const payload = {
-      order_id: orderId,
-      amount: formattedAmount,
-      currency: "LKR",
-      email: document.getElementById("email").value,
-      first_name: document.getElementById("first_name").value,
-      last_name: document.getElementById("last_name").value,
-      contact_number: document.getElementById("contact_number").value,
-      address_line_one: document.getElementById("address_line_one").value
-    };
-
-    debugOutput.innerHTML = "Sending payment request... Order ID: " + orderId;
-    debugOutput.style.display = 'block';
-
-    const response = await fetch(backendUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = html;
+        const form = tempDiv.querySelector("#redirectForm");
+        if (form) {
+          document.body.innerHTML = "<h2>Redirecting to Webxpay...</h2>";
+          document.body.appendChild(form);
+          form.submit();
+        } else {
+          alert("Payment failed: redirect form not found");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Payment request failed. Check console for details.");
+      }
     });
-
-    const html = await response.text();
-
-    if (!response.ok) {
-      console.error("Payment error:", html);
-      alert("Payment failed. Check console.");
-      return;
-    }
-
-    // Inject the form returned by backend and submit automatically
-    const tempDiv = document.createElement("div");
-    tempDiv.innerHTML = html;
-    const form = tempDiv.querySelector("#redirectForm");
-    if (form) {
-      document.body.innerHTML = "<h2>Redirecting to Webxpay...</h2>";
-      document.body.appendChild(form);
-      form.submit();
-    } else {
-      console.error("Redirect form not found in backend response.");
-      alert("Payment failed. Redirect form not found.");
-    }
-
-  } catch (err) {
-    console.error("Critical error:", err);
-    alert("A critical error occurred. See console.");
-  }
-});
-</script>
+  </script>
 </body>
 </html>
+
