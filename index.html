@@ -22,28 +22,20 @@ document.getElementById("payBtn").onclick = async () => {
     address_line_one: "Colombo"
   };
 
+  // Send POST → get HTML back
   const response = await fetch("https://webxpayipg.onrender.com/create-payment", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload)
   });
 
-  // Get backend HTML
   const html = await response.text();
 
-  // Create temporary iframe to execute the HTML safely
-  const iframe = document.createElement("iframe");
-  iframe.style.width = "100%";
-  iframe.style.height = "100%";
-  iframe.style.border = "0";
-
-  document.body.innerHTML = "";  // clear old page
-  document.body.appendChild(iframe);
-
-  const doc = iframe.contentWindow.document;
-  doc.open();
-  doc.write(html);
-  doc.close();
+  // Create a redirect page dynamically
+  const redirectPage = window.open("", "_self"); 
+  redirectPage.document.open();
+  redirectPage.document.write(html);
+  redirectPage.document.close();
 };
 </script>
 
