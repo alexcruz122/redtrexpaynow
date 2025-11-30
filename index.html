@@ -7,7 +7,7 @@
 
 <h2>Pay Now</h2>
 
-<button id="payBtn">Pay 100 LKR</button>
+<button id="payBtn">Pay 100</button>
 
 <script>
 document.getElementById("payBtn").onclick = async () => {
@@ -28,8 +28,22 @@ document.getElementById("payBtn").onclick = async () => {
     body: JSON.stringify(payload)
   });
 
+  // Get backend HTML
   const html = await response.text();
-  document.write(html);
+
+  // Create temporary iframe to execute the HTML safely
+  const iframe = document.createElement("iframe");
+  iframe.style.width = "100%";
+  iframe.style.height = "100%";
+  iframe.style.border = "0";
+
+  document.body.innerHTML = "";  // clear old page
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
 };
 </script>
 
