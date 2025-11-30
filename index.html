@@ -2,50 +2,49 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Webxpay Payment Test</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    input, button { padding: 10px; margin: 5px 0; }
-    button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
-  </style>
+  <title>Webxpay Payment</title>
 </head>
 <body>
-  <h2>Webxpay Payment Test (Redirect Flow)</h2>
-
-  <input type="text" id="amount" value="100.00" placeholder="Amount (e.g., 100.00)">
-  <button id="payButton">Pay Now (LKR)</button>
+  <h2>Webxpay Test Payment</h2>
+  <input type="text" id="amount" value="100.00" placeholder="Amount">
+  <button id="payButton">Pay Now</button>
 
   <script>
     document.getElementById("payButton").addEventListener("click", async () => {
       const orderId = "TEST-" + Date.now();
       const amount = parseFloat(document.getElementById("amount").value).toFixed(2);
 
+      const payload = {
+        order_id: orderId,
+        amount: amount,
+        email: "test.user@example.com",
+        first_name: "Test",
+        last_name: "User",
+        contact_number: "+94712622012"
+      };
+
       try {
         const res = await fetch("https://webxpayipg.onrender.com/create-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ order_id: orderId, amount: amount })
+          body: JSON.stringify(payload)
         });
-
         const html = await res.text();
-        if (!res.ok) throw new Error(html);
-
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = html;
         const form = tempDiv.querySelector("#redirectForm");
         if (form) {
-          document.body.innerHTML = "<h2>Redirecting to Webxpay...</h2>";
+          document.body.innerHTML = "<h2>Redirecting...</h2>";
           document.body.appendChild(form);
           form.submit();
         } else {
-          alert("Payment failed: redirect form not found");
+          alert("Redirect form not found");
         }
       } catch (err) {
         console.error(err);
-        alert("Payment request failed. Check console for details.");
+        alert("Payment request failed. Check console.");
       }
     });
   </script>
 </body>
 </html>
-
