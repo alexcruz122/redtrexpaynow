@@ -15,9 +15,7 @@
 
   <input type="text" id="amount" value="100.00" placeholder="Amount (e.g., 100.00)">
   <input type="text" id="currency" value="LKR" placeholder="Currency (e.g., LKR)">
-  <input type="text" id="order_id" value="" placeholder="Order ID (leave blank to auto-generate)">
-  
-  <button id="payButton">Pay Now (LKR)</button>
+  <button id="payButton">Pay Now</button>
   <div id="debugOutput"></div>
 
   <script>
@@ -28,18 +26,14 @@
 
       payButton.addEventListener("click", async () => {
         try {
-          const orderId = document.getElementById("order_id").value || "TEST-" + Math.floor(Date.now() / 1000);
+          const orderId = "ORDER-" + Date.now();
           const amount = parseFloat(document.getElementById("amount").value).toFixed(2);
-          const currency = document.getElementById("currency").value || "LKR";
+          const currency = document.getElementById("currency").value.trim().toUpperCase();
 
-          const payload = {
-            order_id: orderId,
-            amount: amount,
-            currency: currency
-          };
+          debugOutput.innerHTML = "Creating payment... Order ID: " + orderId;
+          debugOutput.style.display = "block";
 
-          debugOutput.innerHTML = "Sending payment request... Order ID: " + orderId;
-          debugOutput.style.display = 'block';
+          const payload = { order_id: orderId, amount, currency };
 
           const response = await fetch(backendUrl, {
             method: "POST",
@@ -55,7 +49,7 @@
             return;
           }
 
-          // Inject the form returned by backend and submit automatically
+          // Inject the form returned by backend and auto-submit
           const tempDiv = document.createElement("div");
           tempDiv.innerHTML = html;
           const form = tempDiv.querySelector("#redirectForm");
@@ -66,7 +60,7 @@
             form.submit();
           } else {
             console.error("Redirect form not found in backend response.");
-            alert("Payment failed. Redirect form not found.");
+            alert("Payment failed. Redirect form missing.");
           }
 
         } catch (err) {
