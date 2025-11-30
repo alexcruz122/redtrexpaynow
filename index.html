@@ -14,12 +14,9 @@
   <h2>Webxpay Payment Test (Redirect Flow)</h2>
 
   <input type="text" id="amount" value="100.00" placeholder="Amount (e.g., 100.00)">
-  <input type="text" id="email" value="test.user@example.com" placeholder="Email">
-  <input type="text" id="first_name" value="Test" placeholder="First Name">
-  <input type="text" id="last_name" value="User" placeholder="Last Name">
-  <input type="text" id="contact_number" value="+94712622012" placeholder="Contact Number (+94...)">
-  <input type="text" id="address_line_one" value="123 Colombo Road" placeholder="Address Line One">
-
+  <input type="text" id="currency" value="LKR" placeholder="Currency (e.g., LKR)">
+  <input type="text" id="order_id" value="" placeholder="Order ID (leave blank to auto-generate)">
+  
   <button id="payButton">Pay Now (LKR)</button>
   <div id="debugOutput"></div>
 
@@ -27,22 +24,18 @@
     document.addEventListener("DOMContentLoaded", () => {
       const payButton = document.getElementById("payButton");
       const debugOutput = document.getElementById("debugOutput");
-      const backendUrl = "https://webxpayipg.onrender.com/create-payment"; // your Node backend
+      const backendUrl = "https://webxpayipg.onrender.com/create-payment";
 
       payButton.addEventListener("click", async () => {
         try {
-          const orderId = "TEST-" + Math.floor(Date.now() / 1000);
-          const formattedAmount = parseFloat(document.getElementById("amount").value).toFixed(2);
+          const orderId = document.getElementById("order_id").value || "TEST-" + Math.floor(Date.now() / 1000);
+          const amount = parseFloat(document.getElementById("amount").value).toFixed(2);
+          const currency = document.getElementById("currency").value || "LKR";
 
           const payload = {
             order_id: orderId,
-            amount: formattedAmount,
-            currency: "LKR",
-            email: document.getElementById("email").value,
-            first_name: document.getElementById("first_name").value,
-            last_name: document.getElementById("last_name").value,
-            contact_number: document.getElementById("contact_number").value,
-            address_line_one: document.getElementById("address_line_one").value
+            amount: amount,
+            currency: currency
           };
 
           debugOutput.innerHTML = "Sending payment request... Order ID: " + orderId;
